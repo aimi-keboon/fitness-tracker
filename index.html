@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Gym Progress Tracker</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f7f6;
+      color: #1f2933;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 24px 16px 50px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      font-weight: 800;
+    }
+
+    .header p {
+      margin: 0;
+      color: #667085;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    /* Navigation */
+
+    .navigation {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .nav-button {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      border: 1px solid #d0d5dd;
+      background: #ffffff;
+      color: #344054;
+      transition: 0.2s ease;
+    }
+
+    .nav-button:hover {
+      background: #f2f4f7;
+    }
+
+    .nav-button.active {
+      background: #111827;
+      border-color: #111827;
+      color: #ffffff;
+    }
+
+    /* Card */
+
+    .card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 4px 18px rgba(16, 24, 40, 0.07);
+    }
+
+    .section-title {
+      margin: 0 0 20px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #344054;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      height: 48px;
+      padding: 0 14px;
+      border: 1px solid #d0d5dd;
+      border-radius: 10px;
+      background: #ffffff;
+      color: #101828;
+      font-size: 15px;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: #111827;
+      box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+    }
+
+    .field input[readonly] {
+      background: #f9fafb;
+      color: #667085;
+    }
+
+    .helper {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #667085;
+    }
+
+    /* New member */
+
+    .new-member-row {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .new-member-row.show {
+      display: block;
+    }
+
+    .new-member-button {
+      width: 100%;
+      height: 44px;
+      border: 1px dashed #98a2b3;
+      border-radius: 10px;
+      background: #f9fafb;
+      color: #344054;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .new-member-button:hover {
+      background: #f2f4f7;
+    }
+
+    /* Submit */
+
+    .submit-button {
+      width: 100%;
+      height: 52px;
+      border: none;
+      border-radius: 12px;
+      background: #111827;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s ease;
+      margin-top: 4px;
+    }
+
+    .submit-button:hover {
+      background: #000000;
+    }
+
+    .submit-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Message */
+
+    .message {
+      display: none;
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.success {
+      background: #ecfdf3;
+      color: #027a48;
+      border: 1px solid #abefc6;
+    }
+
+    .message.error {
+      background: #fef3f2;
+      color: #b42318;
+      border: 1px solid #fecdca;
+    }
+
+    /* WhatsApp CTA */
+
+    .whatsapp-card {
+      display: none;
+      margin-top: 18px;
+      padding: 20px;
+      border-radius: 14px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      text-align: center;
+    }
+
+    .whatsapp-card.show {
+      display: block;
+    }
+
+    .whatsapp-card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      color: #166534;
+    }
+
+    .whatsapp-card p {
+      margin: 0 0 16px;
+      color: #166534;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .whatsapp-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 46px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      background: #16a34a;
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .whatsapp-button:hover {
+      background: #15803d;
+    }
+
+    /* Leaderboard CTA */
+
+    .leaderboard-link {
+      display: block;
+      margin-top: 14px;
+      text-align: center;
+      color: #344054;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .leaderboard-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Mobile */
+
+    @media (max-width: 480px) {
+
+      .container {
+        padding: 18px 12px 40px;
+      }
+
+      .card {
+        padding: 20px 16px;
+        border-radius: 15px;
+      }
+
+      .header h1 {
+        font-size: 26px;
+      }
+
+      .navigation {
+        gap: 8px;
+      }
+
+      .nav-button {
+        font-size: 13px;
+        padding: 9px 8px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="header">
+      <h1>Gym Progress Tracker</h1>
+      <p>Record your monthly measurement and track your fitness journey.</p>
+    </div>
+
+    <!-- Navigation -->
+
+    <div class="navigation">
+      <a href="index.html" class="nav-button active">
+        Record Measurement
+      </a>
+
+      <a href="leaderboard.html" class="nav-button">
+        View Leaderboard
+      </a>
+    </div>
+
+    <!-- Form -->
+
+    <div class="card">
+
+      <h2 class="section-title">Monthly Measurement</h2>
+
+      <form id="measurementForm">
+
+        <!-- Client -->
+
+        <div class="field">
+
+          <label for="clientName">
+            Member Name
+          </label>
+
+          <select id="clientName">
+            <option value="">Loading members...</option>
+          </select>
+
+          <div class="new-member-row" id="newMemberRow">
+
+            <button
+              type="button"
+              class="new-member-button"
+              id="newMemberButton"
+            >
+              + New Member
+            </button>
+
+          </div>
+
+          <div
+            class="field"
+            id="newMemberField"
+            style="display:none; margin-top:10px;"
+          >
+
+            <input
+              type="text"
+              id="newMemberName"
+              placeholder="Enter member name"
+              autocomplete="off"
+            >
+
+          </div>
+
+        </div>
+
+        <!-- Goal -->
+
+        <div class="field">
+
+          <label for="goal">
+            Goal
+          </label>
+
+          <select id="goal" required>
+
+            <option value="">
+              Select your goal
+            </option>
+
+            <option value="Fat Loss">
+              Fat Loss
+            </option>
+
+            <option value="Muscle Gain">
+              Muscle Gain
+            </option>
+
+            <option value="Body Recomposition">
+              Body Recomposition
+            </option>
+
+            <option value="General Fitness">
+              General Fitness
+            </option>
+
+            <option value="Strength">
+              Strength
+            </option>
+
+            <option value="Other">
+              Other
+            </option>
+
+          </select>
+
+        </div>
+
+        <!-- Month -->
+
+        <div class="field">
+
+          <label for="month">
+            Measurement Month
+          </label>
+
+          <input
+            type="text"
+            id="month"
+            readonly
+          >
+
+          <div class="helper">
+            The month is automatically based on today's date.
+          </div>
+
+        </div>
+
+        <!-- Weight -->
+
+        <div class="field">
+
+          <label for="weight">
+            Weight (kg)
+          </label>
+
+          <input
+            type="number"
+            id="weight"
+            step="0.1"
+            min="0"
+            placeholder="e.g. 65.5"
+            required
+          >
+
+        </div>
+
+        <!-- Lean Body Mass -->
+
+        <div class="field">
+
+          <label for="leanBodyMass">
+            Lean Body Mass (kg)
+          </label>
+
+          <input
+            type="number"
+            id="leanBodyMass"
+            step="0.1"
+            min="0"
+            placeholder="e.g. 45.2"
+            required
+          >
+
+        </div>
+
+        <!-- Skeletal Muscle Mass -->
+
+        <div class="field">
+
+          <label for="skeletalMuscleMass">
+            Skeletal Muscle Mass (kg)
+          </label>
+
+          <input
+            type="number"
+            id="skeletalMuscleMass"
+            step="0.1"
+            min="0"
+            placeholder="e.g. 25.4"
+            required
+          >
+
+        </div>
+
+        <!-- Fat Mass -->
+
+        <div class="field">
+
+          <label for="fatMass">
+            Fat Mass (kg)
+          </label>
+
+          <input
+            type="number"
+            id="fatMass"
+            step="0.1"
+            min="0"
+            placeholder="e.g. 18.2"
+            required
+          >
+
+        </div>
+
+        <button
+          type="submit"
+          class="submit-button"
+          id="submitButton"
+        >
+          Save Measurement
+        </button>
+
+      </form>
+
+      <div
+        id="message"
+        class="message"
+      ></div>
+
+      <!-- WhatsApp -->
+
+      <div
+        id="whatsappCard"
+        class="whatsapp-card"
+      >
+
+        <h3>
+          Your measurement is recorded!
+        </h3>
+
+        <p>
+          Want to see your progress and stay updated with the monthly challenge?
+        </p>
+
+        <a
+          href="https://chat.whatsapp.com/HfewPt5o9f82xxLqVFTXOZ"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="whatsapp-button"
+        >
+          Join Our WhatsApp Group
+        </a>
+
+      </div>
+
+      <!-- Leaderboard shortcut -->
+
+      <a
+        href="leaderboard.html"
+        class="leaderboard-link"
+      >
+        View Monthly Leaderboard →
+      </a>
+
+    </div>
+
+  </div>
+
+
+  <script>
+
+    /*
+      Google Apps Script Web App
+    */
+
+    const SCRIPT_URL =
+      "https://script.google.com/macros/s/AKfycbw0vFz9xOzsBfh5NMDDiZzpCAWkvqj3VSwkKPWtf7tYOfly24Xb6B1xdLyhJlApb-Tm/exec";
+
+
+    /*
+      Elements
+    */
+
+    const clientNameSelect =
+      document.getElementById("clientName");
+
+    const newMemberRow =
+      document.getElementById("newMemberRow");
+
+    const newMemberButton =
+      document.getElementById("newMemberButton");
+
+    const newMemberField =
+      document.getElementById("newMemberField");
+
+    const newMemberName =
+      document.getElementById("newMemberName");
+
+    const monthInput =
+      document.getElementById("month");
+
+    const form =
+      document.getElementById("measurementForm");
+
+    const submitButton =
+      document.getElementById("submitButton");
+
+    const message =
+      document.getElementById("message");
+
+    const whatsappCard =
+      document.getElementById("whatsappCard");
+
+
+    /*
+      Format current month as:
+      October 2026
+    */
+
+    function getCurrentMonth() {
+
+      const now =
+        new Date();
+
+      return new Intl.DateTimeFormat(
+        "en-US",
+        {
+          month: "long",
+          year: "numeric"
+        }
+      ).format(now);
+
+    }
+
+
+    /*
+      Format month for Apps Script.
+
+      Backend still stores:
+      10/26
+
+      User sees:
+      October 2026
+    */
+
+    function getBackendMonth() {
+
+      const now =
+        new Date();
+
+      return (
+        String(
+          now.getMonth() + 1
+        ).padStart(2, "0") +
+        "/" +
+        String(
+          now.getFullYear()
+        ).slice(-2)
+      );
+
+    }
+
+
+    /*
+      Show message
+    */
+
+    function showMessage(
+      text,
+      type
+    ) {
+
+      message.textContent =
+        text;
+
+      message.className =
+        "message show " + type;
+
+    }
+
+
+    /*
+      Load existing members
+    */
+
+    async function loadClients() {
+
+      try {
+
+        const response =
+          await fetch(
+            SCRIPT_URL +
+            "?action=getClients"
+          );
+
+        const result =
+          await response.json();
+
+        if (
+          !result.success ||
+          !Array.isArray(result.clients)
+        ) {
+
+          throw new Error(
+            "Unable to load members."
+          );
+
+        }
+
+        clientNameSelect.innerHTML =
+          '<option value="">Select member</option>';
+
+        result.clients.forEach(
+          function(name) {
+
+            const option =
+              document.createElement(
+                "option"
+              );
+
+            option.value =
+              name;
+
+            option.textContent =
+              name;
+
+            clientNameSelect.appendChild(
+              option
+            );
+
+          }
+        );
+
+        /*
+          Add new member option
+        */
+
+        const newOption =
+          document.createElement(
+            "option"
+          );
+
+        newOption.value =
+          "__NEW_MEMBER__";
+
+        newOption.textContent =
+          "+ New Member";
+
+        clientNameSelect.appendChild(
+          newOption
+        );
+
+        newMemberRow.classList.add(
+          "show"
+        );
+
+      } catch (error) {
+
+        console.error(error);
+
+        clientNameSelect.innerHTML =
+          '<option value="">Unable to load members</option>';
+
+        showMessage(
+          "Unable to load the member list. Please refresh the page.",
+          "error"
+        );
+
+      }
+
+    }
+
+
+    /*
+      Handle member selection
+    */
+
+    clientNameSelect.addEventListener(
+      "change",
+      function() {
+
+        if (
+          clientNameSelect.value ===
+          "__NEW_MEMBER__"
+        ) {
+
+          newMemberField.style.display =
+            "block";
+
+          newMemberName.focus();
+
+        } else {
+
+          newMemberField.style.display =
+            "none";
+
+          newMemberName.value =
+            "";
+
+        }
+
+      }
+    );
+
+
+    /*
+      Extra new member button
+    */
+
+    newMemberButton.addEventListener(
+      "click",
+      function() {
+
+        clientNameSelect.value =
+          "__NEW_MEMBER__";
+
+        newMemberField.style.display =
+          "block";
+
+        newMemberName.focus();
+
+      }
+    );
+
+
+    /*
+      Submit measurement
+    */
+
+    form.addEventListener(
+      "submit",
+      async function(event) {
+
+        event.preventDefault();
+
+        message.className =
+          "message";
+
+        whatsappCard.classList.remove(
+          "show"
+        );
+
+        let clientName =
+          clientNameSelect.value;
+
+        /*
+          If new member
+        */
+
+        if (
+          clientName ===
+          "__NEW_MEMBER__"
+        ) {
+
+          clientName =
+            newMemberName.value.trim();
+
+          if (!clientName) {
+
+            showMessage(
+              "Please enter the new member's name.",
+              "error"
+            );
+
+            newMemberName.focus();
+
+            return;
+
+          }
+
+        }
+
+        /*
+          Validate member
+        */
+
+        if (!clientName) {
+
+          showMessage(
+            "Please select a member.",
+            "error"
+          );
+
+          return;
+
+        }
+
+
+        /*
+          Collect form values
+        */
+
+        const goal =
+          document
+            .getElementById("goal")
+            .value;
+
+        const weight =
+          document
+            .getElementById("weight")
+            .value;
+
+        const leanBodyMass =
+          document
+            .getElementById(
+              "leanBodyMass"
+            )
+            .value;
+
+        const skeletalMuscleMass =
+          document
+            .getElementById(
+              "skeletalMuscleMass"
+            )
+            .value;
+
+        const fatMass =
+          document
+            .getElementById(
+              "fatMass"
+            )
+            .value;
+
+
+        /*
+          Validate goal
+        */
+
+        if (!goal) {
+
+          showMessage(
+            "Please select your goal.",
+            "error"
+          );
+
+          return;
+
+        }
+
+
+        /*
+          Disable button
+        */
+
+        submitButton.disabled =
+          true;
+
+        submitButton.textContent =
+          "Saving Measurement...";
+
+
+        /*
+          Send to Apps Script
+        */
+
+        try {
+
+          const response =
+            await fetch(
+              SCRIPT_URL,
+              {
+                method: "POST",
+
+                body:
+                  JSON.stringify({
+
+                    action:
+                      "addMeasurement",
+
+                    month:
+                      getBackendMonth(),
+
+                    clientName:
+                      clientName,
+
+                    goal:
+                      goal,
+
+                    weight:
+                      weight,
+
+                    leanBodyMass:
+                      leanBodyMass,
+
+                    skeletalMuscleMass:
+                      skeletalMuscleMass,
+
+                    fatMass:
+                      fatMass
+
+                  })
+              }
+            );
+
+          const result =
+            await response.json();
+
+
+          if (!result.success) {
+
+            throw new Error(
+              result.message ||
+              "Unable to save measurement."
+            );
+
+          }
+
+
+          /*
+            Success
+          */
+
+          showMessage(
+            result.message ||
+            "Your measurement has been saved successfully.",
+            "success"
+          );
+
+          whatsappCard.classList.add(
+            "show"
+          );
+
+
+          /*
+            Add new member immediately
+            to dropdown.
+          */
+
+          if (
+            !Array.from(
+              clientNameSelect.options
+            ).some(
+              function(option) {
+                return (
+                  option.value ===
+                  clientName
+                );
+              }
+            )
+          ) {
+
+            const newOption =
+              document.createElement(
+                "option"
+              );
+
+            newOption.value =
+              clientName;
+
+            newOption.textContent =
+              clientName;
+
+            /*
+              Insert before
+              + New Member
+            */
+
+            const newMemberOption =
+              Array.from(
+                clientNameSelect.options
+              ).find(
+                function(option) {
+                  return (
+                    option.value ===
+                    "__NEW_MEMBER__"
+                  );
+                }
+              );
+
+            clientNameSelect.insertBefore(
+              newOption,
+              newMemberOption
+            );
+
+          }
+
+
+          clientNameSelect.value =
+            clientName;
+
+          newMemberField.style.display =
+            "none";
+
+          newMemberName.value =
+            "";
+
+
+        } catch (error) {
+
+          console.error(error);
+
+          showMessage(
+            error.message ||
+            "Something went wrong. Please try again.",
+            "error"
+          );
+
+        } finally {
+
+          submitButton.disabled =
+            false;
+
+          submitButton.textContent =
+            "Save Measurement";
+
+        }
+
+      }
+    );
+
+
+    /*
+      Set current month
+    */
+
+    monthInput.value =
+      getCurrentMonth();
+
+
+    /*
+      Load members when page opens
+    */
+
+    loadClients();
+
+  </script>
+
+</body>
+</html>

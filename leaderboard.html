@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Monthly Leaderboard</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f7f6;
+      color: #1f2933;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 24px 16px 50px;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      font-weight: 800;
+    }
+
+    .header p {
+      margin: 0;
+      color: #667085;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    /* =========================
+       NAVIGATION
+    ========================= */
+
+    .navigation {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .nav-button {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      border: 1px solid #d0d5dd;
+      background: #ffffff;
+      color: #344054;
+      transition: 0.2s ease;
+    }
+
+    .nav-button:hover {
+      background: #f2f4f7;
+    }
+
+    .nav-button.active {
+      background: #111827;
+      border-color: #111827;
+      color: #ffffff;
+    }
+
+    /* =========================
+       MONTH
+    ========================= */
+
+    .month-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 20px;
+      text-align: center;
+      box-shadow: 0 4px 18px rgba(16, 24, 40, 0.07);
+    }
+
+    .month-label {
+      margin: 0 0 5px;
+      color: #667085;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .month-title {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 800;
+      color: #111827;
+    }
+
+    .comparison-text {
+      margin: 8px 0 0;
+      color: #667085;
+      font-size: 13px;
+    }
+
+    /* =========================
+       PODIUM
+    ========================= */
+
+    .podium {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 24px;
+    }
+
+    .podium-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 20px 14px;
+      text-align: center;
+      box-shadow: 0 4px 18px rgba(16, 24, 40, 0.07);
+    }
+
+    .podium-card.first {
+      padding-top: 28px;
+      padding-bottom: 28px;
+    }
+
+    .podium-rank {
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .podium-card.first .podium-rank {
+      font-size: 36px;
+    }
+
+    .podium-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: #111827;
+      word-break: break-word;
+    }
+
+    .podium-progress {
+      margin-top: 10px;
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .podium-goal {
+      margin-top: 5px;
+      font-size: 11px;
+      color: #667085;
+    }
+
+    /* =========================
+       LEADERBOARD CARD
+    ========================= */
+
+    .leaderboard-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 4px 18px rgba(16, 24, 40, 0.07);
+    }
+
+    .leaderboard-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .leaderboard-heading h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .member-count {
+      color: #667085;
+      font-size: 13px;
+    }
+
+    /* =========================
+       CLIENT ROW
+    ========================= */
+
+    .client-row {
+      border: 1px solid #eaecf0;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      background: #ffffff;
+    }
+
+    .client-row.extra-client {
+      display: none;
+    }
+
+    .client-row.extra-client.show {
+      display: block;
+    }
+
+    .client-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .client-identity {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .rank {
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      border-radius: 12px;
+      background: #f2f4f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 900;
+      color: #344054;
+    }
+
+    .client-name {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 800;
+      color: #101828;
+      word-break: break-word;
+    }
+
+    .client-goal {
+      margin-top: 3px;
+      color: #667085;
+      font-size: 12px;
+    }
+
+    .overall {
+      text-align: right;
+      flex: 0 0 auto;
+    }
+
+    .overall-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      color: #667085;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 3px;
+    }
+
+    .overall-value {
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    /* =========================
+       PROGRESS METRICS
+    ========================= */
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .metric {
+      padding: 11px 9px;
+      border-radius: 10px;
+      background: #f9fafb;
+      min-width: 0;
+    }
+
+    .metric-label {
+      display: block;
+      margin-bottom: 5px;
+      color: #667085;
+      font-size: 10px;
+      line-height: 1.25;
+      font-weight: 700;
+    }
+
+    .metric-value {
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    /* =========================
+       COLORS
+    ========================= */
+
+    .positive {
+      color: #039855;
+    }
+
+    .negative {
+      color: #d92d20;
+    }
+
+    .neutral {
+      color: #667085;
+    }
+
+    /* =========================
+       SHOW MORE
+    ========================= */
+
+    .show-more-button {
+      width: 100%;
+      min-height: 46px;
+      margin-top: 4px;
+      border: 1px solid #d0d5dd;
+      border-radius: 11px;
+      background: #ffffff;
+      color: #344054;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .show-more-button:hover {
+      background: #f9fafb;
+    }
+
+    /* =========================
+       EMPTY / LOADING
+    ========================= */
+
+    .status {
+      padding: 35px 20px;
+      text-align: center;
+      color: #667085;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .error {
+      color: #b42318;
+    }
+
+    /* =========================
+       FOOTER CTA
+    ========================= */
+
+    .record-link {
+      display: block;
+      margin-top: 18px;
+      text-align: center;
+      color: #344054;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .record-link:hover {
+      text-decoration: underline;
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 600px) {
+
+      .container {
+        padding: 18px 12px 40px;
+      }
+
+      .header h1 {
+        font-size: 27px;
+      }
+
+      .navigation {
+        gap: 8px;
+      }
+
+      .nav-button {
+        font-size: 13px;
+        padding: 9px 8px;
+      }
+
+      .podium {
+        gap: 7px;
+      }
+
+      .podium-card {
+        padding: 16px 8px;
+      }
+
+      .podium-card.first {
+        padding-top: 22px;
+        padding-bottom: 22px;
+      }
+
+      .podium-rank {
+        font-size: 22px;
+      }
+
+      .podium-card.first .podium-rank {
+        font-size: 29px;
+      }
+
+      .podium-name {
+        font-size: 13px;
+      }
+
+      .podium-progress {
+        font-size: 17px;
+      }
+
+      .podium-goal {
+        font-size: 10px;
+      }
+
+      .leaderboard-card {
+        padding: 15px;
+      }
+
+      .client-row {
+        padding: 13px;
+      }
+
+      .client-top {
+        gap: 8px;
+      }
+
+      .rank {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+      }
+
+      .client-name {
+        font-size: 15px;
+      }
+
+      .overall-value {
+        font-size: 19px;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .metric {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .metric-label {
+        margin-bottom: 0;
+        font-size: 11px;
+      }
+
+      .metric-value {
+        font-size: 14px;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+  <div class="container">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+      <h1>
+        Monthly Leaderboard
+      </h1>
+
+      <p>
+        Track your progress. Challenge yourself. Keep moving forward.
+      </p>
+
+    </div>
+
+
+    <!-- NAVIGATION -->
+
+    <div class="navigation">
+
+      <a
+        href="index.html"
+        class="nav-button"
+      >
+        ← Record Measurement
+      </a>
+
+      <a
+        href="leaderboard.html"
+        class="nav-button active"
+      >
+        Leaderboard
+      </a>
+
+    </div>
+
+
+    <!-- MONTH -->
+
+    <div
+      class="month-card"
+      id="monthCard"
+      style="display:none;"
+    >
+
+      <p class="month-label">
+        Current Challenge
+      </p>
+
+      <h2
+        class="month-title"
+        id="monthTitle"
+      >
+        October 2026
+      </h2>
+
+      <p
+        class="comparison-text"
+        id="comparisonText"
+      >
+      </p>
+
+    </div>
+
+
+    <!-- PODIUM -->
+
+    <div
+      class="podium"
+      id="podium"
+      style="display:none;"
+    >
+    </div>
+
+
+    <!-- LEADERBOARD -->
+
+    <div class="leaderboard-card">
+
+      <div class="leaderboard-heading">
+
+        <h2>
+          Rankings
+        </h2>
+
+        <span
+          class="member-count"
+          id="memberCount"
+        >
+        </span>
+
+      </div>
+
+
+      <div
+        id="leaderboardContent"
+        class="status"
+      >
+        Loading leaderboard...
+      </div>
+
+
+      <button
+        id="showMoreButton"
+        class="show-more-button"
+        style="display:none;"
+      >
+        Show Full Leaderboard ↓
+      </button>
+
+    </div>
+
+
+    <!-- RECORD MEASUREMENT -->
+
+    <a
+      href="index.html"
+      class="record-link"
+    >
+      Record Your Monthly Measurement →
+    </a>
+
+  </div>
+
+
+  <script>
+
+    /*
+      Google Apps Script Web App
+    */
+
+    const SCRIPT_URL =
+      "https://script.google.com/macros/s/AKfycbw0vFz9xOzsBfh5NMDDiZzpCAWkvqj3VSwkKPWtf7tYOfly24Xb6B1xdLyhJlApb-Tm/exec";
+
+
+    /*
+      Elements
+    */
+
+    const monthCard =
+      document.getElementById(
+        "monthCard"
+      );
+
+    const monthTitle =
+      document.getElementById(
+        "monthTitle"
+      );
+
+    const comparisonText =
+      document.getElementById(
+        "comparisonText"
+      );
+
+    const podium =
+      document.getElementById(
+        "podium"
+      );
+
+    const leaderboardContent =
+      document.getElementById(
+        "leaderboardContent"
+      );
+
+    const memberCount =
+      document.getElementById(
+        "memberCount"
+      );
+
+    const showMoreButton =
+      document.getElementById(
+        "showMoreButton"
+      );
+
+
+    /*
+      Convert backend month:
+
+      10/26
+
+      into:
+
+      October 2026
+    */
+
+    function formatMonth(month) {
+
+      if (!month) {
+        return "";
+      }
+
+      const parts =
+        String(month).split("/");
+
+      if (
+        parts.length !== 2
+      ) {
+
+        return month;
+
+      }
+
+      const monthNumber =
+        Number(parts[0]);
+
+      const shortYear =
+        Number(parts[1]);
+
+      if (
+        isNaN(monthNumber) ||
+        isNaN(shortYear)
+      ) {
+
+        return month;
+
+      }
+
+      const year =
+        2000 + shortYear;
+
+      const date =
+        new Date(
+          year,
+          monthNumber - 1,
+          1
+        );
+
+      return new Intl.DateTimeFormat(
+        "en-US",
+        {
+          month: "long",
+          year: "numeric"
+        }
+      ).format(date);
+
+    }
+
+
+    /*
+      Format percentage
+    */
+
+    function formatPercentage(
+      value
+    ) {
+
+      const number =
+        Number(value);
+
+      if (
+        !isFinite(number)
+      ) {
+
+        return "0.00%";
+
+      }
+
+      const rounded =
+        number.toFixed(2);
+
+      if (
+        number > 0
+      ) {
+
+        return "+" + rounded + "%";
+
+      }
+
+      return rounded + "%";
+
+    }
+
+
+    /*
+      Get direction class
+    */
+
+    function getClass(
+      value
+    ) {
+
+      const number =
+        Number(value);
+
+      if (
+        number > 0
+      ) {
+
+        return "positive";
+
+      }
+
+      if (
+        number < 0
+      ) {
+
+        return "negative";
+
+      }
+
+      return "neutral";
+
+    }
+
+
+    /*
+      LBM / SMM direction
+    */
+
+    function getIncreaseArrow(
+      value
+    ) {
+
+      const number =
+        Number(value);
+
+      if (
+        number > 0
+      ) {
+
+        return "↑";
+
+      }
+
+      if (
+        number < 0
+      ) {
+
+        return "↓";
+
+      }
+
+      return "→";
+
+    }
+
+
+    /*
+      Fat Mass direction
+
+      Reduction = good = ↓
+
+      Increase = bad = ↑
+    */
+
+    function getFatArrow(
+      value
+    ) {
+
+      const number =
+        Number(value);
+
+      if (
+        number > 0
+      ) {
+
+        return "↓";
+
+      }
+
+      if (
+        number < 0
+      ) {
+
+        return "↑";
+
+      }
+
+      return "→";
+
+    }
+
+
+    /*
+      Display top 3 podium
+    */
+
+    function renderPodium(
+      leaderboard
+    ) {
+
+      if (
+        leaderboard.length === 0
+      ) {
+
+        podium.style.display =
+          "none";
+
+        return;
+
+      }
+
+      const topThree =
+        leaderboard.slice(
+          0,
+          3
+        );
+
+      /*
+        We display:
+
+        #2
+        #1
+        #3
+      */
+
+      const order = [];
+
+      if (
+        topThree[1]
+      ) {
+
+        order.push({
+          data: topThree[1],
+          className: ""
+        });
+
+      }
+
+      if (
+        topThree[0]
+      ) {
+
+        order.push({
+          data: topThree[0],
+          className: "first"
+        });
+
+      }
+
+      if (
+        topThree[2]
+      ) {
+
+        order.push({
+          data: topThree[2],
+          className: ""
+        });
+
+      }
+
+
+      podium.innerHTML =
+        order.map(
+          function(item) {
+
+            const client =
+              item.data;
+
+            const progressClass =
+              getClass(
+                client.overallProgress
+              );
+
+            return `
+
+              <div class="podium-card ${item.className}">
+
+                <div class="podium-rank">
+                  #${client.monthlyRank}
+                </div>
+
+                <div class="podium-name">
+                  ${escapeHtml(client.clientName)}
+                </div>
+
+                <div class="podium-progress ${progressClass}">
+                  ${formatPercentage(client.overallProgress)}
+                </div>
+
+                <div class="podium-goal">
+                  ${escapeHtml(client.goal || "Fitness Journey")}
+                </div>
+
+              </div>
+
+            `;
+
+          }
+        ).join("");
+
+      podium.style.display =
+        "grid";
+
+    }
+
+
+    /*
+      Render leaderboard rows
+    */
+
+    function renderLeaderboard(
+      leaderboard
+    ) {
+
+      if (
+        leaderboard.length === 0
+      ) {
+
+        leaderboardContent.innerHTML =
+          `
+            <div class="status">
+              No leaderboard data available yet.
+              <br><br>
+              Members need measurements for both the current month and previous month before they can appear in the ranking.
+            </div>
+          `;
+
+        memberCount.textContent =
+          "";
+
+        showMoreButton.style.display =
+          "none";
+
+        return;
+
+      }
+
+
+      memberCount.textContent =
+        leaderboard.length +
+        (
+          leaderboard.length === 1
+            ? " member"
+            : " members"
+        );
+
+
+      leaderboardContent.innerHTML =
+        leaderboard.map(
+          function(client, index) {
+
+            const extraClass =
+              index >= 4
+                ? "extra-client"
+                : "";
+
+            const overallClass =
+              getClass(
+                client.overallProgress
+              );
+
+            const leanClass =
+              getClass(
+                client.leanBodyMassProgress
+              );
+
+            const muscleClass =
+              getClass(
+                client.skeletalMuscleMassProgress
+              );
+
+            const fatClass =
+              getClass(
+                client.fatMassReduction
+              );
+
+            const leanArrow =
+              getIncreaseArrow(
+                client.leanBodyMassProgress
+              );
+
+            const muscleArrow =
+              getIncreaseArrow(
+                client.skeletalMuscleMassProgress
+              );
+
+            const fatArrow =
+              getFatArrow(
+                client.fatMassReduction
+              );
+
+
+            return `
+
+              <div
+                class="client-row ${extraClass}"
+                data-index="${index}"
+              >
+
+                <div class="client-top">
+
+                  <div class="client-identity">
+
+                    <div class="rank">
+                      #${client.monthlyRank}
+                    </div>
+
+                    <div>
+
+                      <div class="client-name">
+                        ${escapeHtml(client.clientName)}
+                      </div>
+
+                      <div class="client-goal">
+                        ${escapeHtml(client.goal || "Fitness Journey")}
+                      </div>
+
+                    </div>
+
+                  </div>
+
+
+                  <div class="overall">
+
+                    <span class="overall-label">
+                      Overall Progress
+                    </span>
+
+                    <span class="overall-value ${overallClass}">
+                      ${formatPercentage(client.overallProgress)}
+                    </span>
+
+                  </div>
+
+                </div>
+
+
+                <div class="metrics">
+
+                  <div class="metric">
+
+                    <span class="metric-label">
+                      Lean Body Mass
+                    </span>
+
+                    <span class="metric-value ${leanClass}">
+                      ${leanArrow}
+                      ${formatPercentage(client.leanBodyMassProgress)}
+                    </span>
+
+                  </div>
+
+
+                  <div class="metric">
+
+                    <span class="metric-label">
+                      Skeletal Muscle Mass
+                    </span>
+
+                    <span class="metric-value ${muscleClass}">
+                      ${muscleArrow}
+                      ${formatPercentage(client.skeletalMuscleMassProgress)}
+                    </span>
+
+                  </div>
+
+
+                  <div class="metric">
+
+                    <span class="metric-label">
+                      Fat Mass
+                    </span>
+
+                    <span class="metric-value ${fatClass}">
+                      ${fatArrow}
+                      ${formatPercentage(client.fatMassReduction)}
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            `;
+
+          }
+        ).join("");
+
+
+      /*
+        Show full leaderboard button
+        only when there are more
+        than 4 members.
+      */
+
+      if (
+        leaderboard.length > 4
+      ) {
+
+        showMoreButton.style.display =
+          "block";
+
+        showMoreButton.textContent =
+          "Show Full Leaderboard ↓";
+
+      } else {
+
+        showMoreButton.style.display =
+          "none";
+
+      }
+
+    }
+
+
+    /*
+      Show / hide additional rows
+    */
+
+    let leaderboardExpanded =
+      false;
+
+
+    showMoreButton.addEventListener(
+      "click",
+      function() {
+
+        leaderboardExpanded =
+          !leaderboardExpanded;
+
+        const extraClients =
+          document.querySelectorAll(
+            ".extra-client"
+          );
+
+        extraClients.forEach(
+          function(row) {
+
+            if (
+              leaderboardExpanded
+            ) {
+
+              row.classList.add(
+                "show"
+              );
+
+            } else {
+
+              row.classList.remove(
+                "show"
+              );
+
+            }
+
+          }
+        );
+
+
+        if (
+          leaderboardExpanded
+        ) {
+
+          showMoreButton.textContent =
+            "Show Less ↑";
+
+        } else {
+
+          showMoreButton.textContent =
+            "Show Full Leaderboard ↓";
+
+        }
+
+      }
+    );
+
+
+    /*
+      Load leaderboard
+    */
+
+    async function loadLeaderboard() {
+
+      try {
+
+        const response =
+          await fetch(
+            SCRIPT_URL +
+            "?action=getLeaderboard"
+          );
+
+        const result =
+          await response.json();
+
+
+        if (
+          !result.success
+        ) {
+
+          throw new Error(
+            result.message ||
+            "Unable to load leaderboard."
+          );
+
+        }
+
+
+        const data =
+          result.data || {};
+
+        const leaderboard =
+          Array.isArray(
+            data.leaderboard
+          )
+            ? data.leaderboard
+            : [];
+
+
+        /*
+          Month
+        */
+
+        if (
+          data.month
+        ) {
+
+          monthTitle.textContent =
+            formatMonth(
+              data.month
+            );
+
+          monthCard.style.display =
+            "block";
+
+
+          /*
+            Determine previous month
+            from the first client.
+          */
+
+          if (
+            leaderboard.length > 0 &&
+            leaderboard[0].previousMonth
+          ) {
+
+            comparisonText.textContent =
+              "Progress compared with " +
+              formatMonth(
+                leaderboard[0].previousMonth
+              );
+
+          } else {
+
+            comparisonText.textContent =
+              "Monthly progress rankings";
+
+          }
+
+        }
+
+
+        /*
+          Render everything
+        */
+
+        renderPodium(
+          leaderboard
+        );
+
+        renderLeaderboard(
+          leaderboard
+        );
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        monthCard.style.display =
+          "none";
+
+        podium.style.display =
+          "none";
+
+        memberCount.textContent =
+          "";
+
+        leaderboardContent.innerHTML =
+          `
+            <div class="status error">
+              Unable to load the leaderboard.
+              <br><br>
+              Please refresh the page and try again.
+            </div>
+          `;
+
+        showMoreButton.style.display =
+          "none";
+
+      }
+
+    }
+
+
+    /*
+      Prevent HTML injection
+      from member names / goals.
+    */
+
+    function escapeHtml(
+      value
+    ) {
+
+      return String(
+        value || ""
+      )
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+        .replace(
+          /</g,
+          "&lt;"
+        )
+        .replace(
+          />/g,
+          "&gt;"
+        )
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+        .replace(
+          /'/g,
+          "&#039;"
+        );
+
+    }
+
+
+    /*
+      Start
+    */
+
+    loadLeaderboard();
+
+  </script>
+
+</body>
+</html>
